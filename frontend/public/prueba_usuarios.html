@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Creación de Usuario</title>
+</head>
+<body>
+    <h2>Crear Usuario en Firebase</h2>
+    <form id="userForm" action="http://localhost:8080/crearUsuario" method="POST" enctype="multipart/form-data">
+        <label for="usuario_id">ID de Usuario:</label>
+        <input type="text" id="usuario_id" name="usuario_id" required><br><br>
+
+        <label for="nombreDeUsuario">Nombre de Usuario:</label>
+        <input type="text" id="nombreDeUsuario" name="nombreDeUsuario" required><br><br>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required><br><br>
+
+        <label for="rol">Rol:</label>
+        <select id="rol" name="rol">
+            <option value="admin">Admin</option>
+            <option value="usuario">Usuario</option>
+            <option value="invitado" selected>Invitado</option>
+        </select><br><br>
+
+        <button type="submit">Crear Usuario</button>
+    </form>
+
+    <div id="response"></div>
+
+   
+</body>
+</html>

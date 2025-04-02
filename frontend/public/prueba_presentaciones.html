@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Creación de Presentación</title>
+</head>
+<body>
+    <h2>Crear Presentación en Firebase</h2>
+    <form id="presentationForm" action="http://localhost:8080/crearPresentacion" method="POST" enctype="multipart/form-data">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required><br><br>
+
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" required></textarea><br><br>
+
+        <label for="usuario_id">ID de Usuario:</label>
+        <input type="text" id="usuario_id" name="usuario_id" required><br><br>
+
+        <label for="presentacion">Subir Archivo:</label>
+        <input type="file" id="presentacion" name="presentacion" accept=".pdf,.pptx" required><br><br>
+
+        <button type="submit">Crear Presentación</button>
+    </form>
+
+    <div id="response"></div>
+</body>
+</html>

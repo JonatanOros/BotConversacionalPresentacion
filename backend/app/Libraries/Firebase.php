@@ -7,7 +7,7 @@ class Firebase {
     private $database;
 
     public function __construct() {
-        $firebase = (new Factory)->withServiceAccount(APPPATH . '../../botconversacional-652e5-firebase-adminsdk-fbsvc-8cd38fbb87.json');
+        $firebase = (new Factory)->withServiceAccount(ROOTPATH . 'botconversacional-652e5-firebase-adminsdk-fbsvc-1810c4806f.json');
         $this->database = $firebase->createFirestore()->database();
     }
 
