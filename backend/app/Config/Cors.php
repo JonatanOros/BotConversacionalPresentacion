@@ -34,7 +34,10 @@ class Cors extends BaseConfig
          *   - ['http://localhost:8080']
          *   - ['https://www.example.com']
          */
-        'allowedOrigins' => [],
+        
+         
+         'allowedOrigins' => ['http://localhost:3000'],
+
 
         /**
          * Origin regex patterns for the `Access-Control-Allow-Origin` header.
@@ -57,7 +60,7 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
          */
-        'supportsCredentials' => false,
+        'supportsCredentials' => true,
 
         /**
          * Set headers to allow.
@@ -68,7 +71,8 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
          */
-        'allowedHeaders' => [],
+        
+        'allowedHeaders' => ['Content-Type', 'Authorization', 'X-Requested-With'],
 
         /**
          * Set headers to expose.
@@ -79,7 +83,7 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
          */
-        'exposedHeaders' => [],
+        'exposedHeaders' => ['Content-Disposition'],
 
         /**
          * Set methods to allow.
@@ -93,7 +97,8 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
          */
-        'allowedMethods' => [],
+        
+        'allowedMethods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
         /**
          * Set how many seconds the results of a preflight request can be cached.
@@ -102,4 +107,15 @@ class Cors extends BaseConfig
          */
         'maxAge' => 7200,
     ];
+
+
+    /*public array $allowedOrigins = ['http://localhost:3000']; // o ['http://localhost:3000']
+
+    public array $allowedHeaders = [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+    ];
+    
+    public array $allowedMethods = ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE']; */ 
 }

@@ -23,5 +23,44 @@ class MensajeModel extends Model
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
         }
+
+
     }
+
+
+
+    public function guardarMensaje($mensajeData)
+    {
+        try {
+            $this->firebase->getDatabase()
+                ->collection('mensajes')
+                ->add($mensajeData);
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+
+    public function obtenerMensajesPorUsuario($usuarioId)
+    {
+        try {
+            $mensajes = [];
+            $documentos = $this->firebase->getDatabase()
+                ->collection('mensajes')
+                ->where('usuario_id', '=', $usuarioId)
+                ->documents();
+
+            foreach ($documentos as $doc) {
+                if ($doc->exists()) {
+                    $mensajes[] = $doc->data();
+                }
+            }
+
+            return $mensajes;
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+    
 }

@@ -24,4 +24,16 @@ class UsuarioModel extends Model
             return ['error' => $e->getMessage()];
         }
     }
+
+
+    public function existeUsuario($usuarioId)
+    {
+        try {
+            $document = $this->firebase->getDatabase()->collection('usuarios')->document($usuarioId)->snapshot();
+            return $document->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+    
 }
