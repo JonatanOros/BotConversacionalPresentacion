@@ -78,6 +78,24 @@ class PresentacionModel extends Model
             return ['error' => $e->getMessage()];
         }
     }
+
+
+
+    public function eliminarPresentacion($id)
+    {
+        
+        try {
+            $this->firebase->getDatabase()
+                     ->collection('presentaciones')
+                     ->document($id)
+                     ->delete();
+            return true;
+        } catch (\Exception $e) {
+            log_message('error', 'Error eliminando presentación: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
     
 
 

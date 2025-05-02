@@ -52,10 +52,14 @@ class ControladorUsuario extends ResourceController
 
     public function verificarLoginTelegram()
     {
-        // CORS local
-        header("Access-Control-Allow-Origin: *");
+        // Reemplaza con el dominio real de tu frontend (usando ngrok por ejemplo)
+        $frontendPermitido = 'https://tu-front.ngrok.app';
+
+        header("Access-Control-Allow-Origin: $frontendPermitido");
+        header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Headers: Content-Type");
         header("Access-Control-Allow-Methods: POST");
+
     
         // Obtener JSON del frontend
         $json = file_get_contents('php://input');
@@ -80,16 +84,28 @@ class ControladorUsuario extends ResourceController
     
         $secret_key = hash('sha256', $this->botToken, true);
         $hash_calculado = hash_hmac('sha256', $check_string, $secret_key);
-    
+
+
+
         if ($hash_calculado === $hash_recibido) {
-            // Validación exitosa, ahora crear/verificar usuario
+            // Validación exitosa
             $usuario_id = $datos['id'];
             $nombre = $datos['first_name'] ?? '';
             $apellido = $datos['last_name'] ?? '';
             $username = $datos['username'] ?? '';
-    
+        
             $this->verificarOCrearUsuario($usuario_id, $username, $nombre, $apellido);
-    
+        
+            // Crear sesión
+            $session = session();
+            $session->set([
+                'usuario_id' => $usuario_id,
+                'nombre' => $nombre,
+                'apellido' => $apellido,
+                'nombreDeUsuario' => $username,
+                'logueado' => true,
+            ]);
+        
             return $this->response->setStatusCode(200)->setJSON([
                 'status' => 'ok',
                 'mensaje' => 'Usuario autenticado con éxito',
@@ -100,16 +116,95 @@ class ControladorUsuario extends ResourceController
                     'nombreDeUsuario' => $username
                 ]
             ]);
-        } else {
+        }else {
             return $this->response->setStatusCode(401)->setJSON([
                 'status' => 'error',
                 'mensaje' => 'Hash no válido, acceso denegado'
             ]);
         }
     }
-    
-    
 
 
+
+
+    public function usuarioLogueado()
+    {
+        // CORS local
+        // Reemplaza con el dominio real de tu frontend (usando ngrok por ejemplo)
+        $frontendPermitido = 'https://tu-front.ngrok.app';
+
+        header("Access-Control-Allow-Origin: $frontendPermitido");
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Allow-Methods: GET");
+
+
+        $session = session();
+    
+        if ($session->get('logueado')) {
+            return $this->response->setStatusCode(200)->setJSON([
+                'logueado' => true,
+                'usuario' => [
+                    'usuario_id' => $session->get('usuario_id'),
+                    'nombre' => $session->get('nombre'),
+                    'apellido' => $session->get('apellido'),
+                    'nombreDeUsuario' => $session->get('nombreDeUsuario')
+                ]
+            ]);
+        } else {
+            return $this->response->setStatusCode(401)->setJSON([
+                'logueado' => false,
+                'mensaje' => 'No hay sesión activa'
+            ]);
+        }
+    }
+
+
+
+
+    public function cerrarSesion()
+    {
+        // CORS local
+        // Reemplaza con el dominio real de tu frontend (usando ngrok por ejemplo)
+        $frontendPermitido = 'https://tu-front.ngrok.app';
+
+        header("Access-Control-Allow-Origin: $frontendPermitido");
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Allow-Methods: POST");
+
+
+        $session = session();
+        $session->destroy();
+    
+        return $this->response->setStatusCode(200)->setJSON([
+            'status' => 'ok',
+            'mensaje' => 'Sesión cerrada exitosamente'
+        ]);
+    }
+
+
+    public function obtenerUsuario()
+    {
+
+
+        // CORS local
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Allow-Methods: GET");
+
+        
+        if (session()->has('usuario_id')) {
+            return $this->response->setJSON([
+                'id_telegram' => session('usuario_id')
+            ]);
+        } else {
+            return $this->response->setStatusCode(401)->setJSON([
+                'error' => 'No autenticado'
+            ]);
+        }
+    }
+    
+    
     
 }

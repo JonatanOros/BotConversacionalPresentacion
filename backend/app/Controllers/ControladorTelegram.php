@@ -135,7 +135,7 @@ class ControladorTelegram extends ResourceController
             case '/desplegar':
                 return "Puedes seleccionar la presentacion que desea desplegar y verlas aqui";
             default:
-                return "No reconozco el comando. Escribe /ayuda para ver opciones";
+                return "No reconozco el comando. Escribe /menu para ver opciones";
         }
     }
 
@@ -167,11 +167,20 @@ class ControladorTelegram extends ResourceController
         $presentacionId = $data['presentacionId'];
         $nombreArchivo = $data['nombreArchivo'];
 
+        // Extraemos la extensión del archivo usando pathinfo
+        $extension = pathinfo($nombreArchivo, PATHINFO_EXTENSION);
+
         // Mandar mensajes al bot
         $this->enviarMensajeDesdeTelegram($chatId, "{Desde la Web APP}: La presentación es la siguiente: $nombreArchivo");
-        
 
-        $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
+
+        // Verificamos la extensión para elegir el visor adecuado
+        if ('pptx' === strtolower($extension)) {
+            $urlVisor = "http://localhost:3000/visorpptx/" . $presentacionId;
+        } else {
+            $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
+        }
+
         $this->enviarMensajeDesdeTelegram($chatId, "Puedes ver tu presentación en: $urlVisor");
 
         return $this->response->setJSON([
@@ -336,82 +345,70 @@ class ControladorTelegram extends ResourceController
     //De aqui en adelante se encuentra la logica para manejar mensajes o documentos enviados desde telegram
 
 
-     public function manejarMensajesTelegram()
-{
+    public function manejarMensajesTelegram()
+    {
+        // Leer el contenido JSON recibido directamente del webhook
+        $input = file_get_contents('php://input');
+        $update = json_decode($input, true);
     
-
-    $urlBase = "https://api.telegram.org/bot{$this->botToken}";
-    $rutaUpdate = WRITEPATH . 'telegram_last_update.txt';
-
-    // Leer el último update_id procesado
-    $ultimoUpdateId = 0;
-    if (file_exists($rutaUpdate)) {
-        $ultimoUpdateId = (int) file_get_contents($rutaUpdate);
-    }
-
-    // Obtener solo los updates nuevos
-    $url = "{$urlBase}/getUpdates?offset=" . ($ultimoUpdateId + 1);
-    $response = file_get_contents($url);
-    $updates = json_decode($response, true);
-
-    if (!isset($updates['result'])) {
-        return $this->fail("No se recibieron mensajes");
-    }
-
-    foreach ($updates['result'] as $update) {
-
-        // Guardamos el update_id actual y al final del bucle lo escribimos en el archivo)
-        $updateId = $update['update_id'];
+        if (!$update) {
+            return $this->fail("No se recibió ningún mensaje válido");
+        }
+    
         $message = $update['message'] ?? null;
-        if (!$message) continue;
-
+        if (!$message) {
+            return $this->fail("No se recibió ningún mensaje válido");
+        }
+    
         $chatId = $message['chat']['id'];
         $nombre = $message['chat']['first_name'] ?? '';
         $apellido = $message['chat']['last_name'] ?? '';
         $nombreUsuario = $message['chat']['username'] ?? '';
         $usuarioId = (string)$chatId;
-
+    
         // Verificar si es archivo
         if (isset($message['document'])) {
             $documento = $message['document'];
             $fileName = $documento['file_name'];
             $fileId = $documento['file_id'];
             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-
+    
             if (!in_array(strtolower($extension), ['pdf', 'ppt', 'pptx'])) {
                 $this->enviarMensajeDesdeTelegram($chatId, " No se acepta este tipo de archivo.\nIntenta con un archivo PDF o PowerPoint.");
                 $this->enviarComandosDisponibles($chatId);
-                continue;
+                return $this->respond(['mensaje' => 'Mensaje procesado']);
             }
-
+    
             // Crear usuario si no existe
             $this->crearUsuarioDesdeTelegram($usuarioId, $nombreUsuario, $nombre, $apellido);
-
+    
             $presentacionCtrl = new \App\Controllers\ControladorPresentaciones();
-
+    
             // Paso 1: Descargar el archivo
             $contenidoBinario = $this->obtenerArchivoDesdeTelegram($fileId);
             $resultadoSubida = $presentacionCtrl->subirArchivoDesdeTelegram($contenidoBinario, $fileName);
             
             // Paso 2: Subir a Firebase
             if (!isset($resultadoSubida['error'])) {
-                $presentacionId =$presentacionCtrl->crearPresentacionDesdeTelegram($usuarioId, $fileName, $resultadoSubida['file_url']);
+                $presentacionId = $presentacionCtrl->crearPresentacionDesdeTelegram($usuarioId, $resultadoSubida['nombre_Archivo'], $resultadoSubida['file_url']);
             }
-
-
-            //Se envia el URL
+    
+            // Se envía el URL
             if ($presentacionId) {
-                $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
-            
+
+                if('pptx'===$resultadoSubida['extension']){
+                    $urlVisor = "http://localhost:3000/visorpptx/" . $presentacionId;
+                }else{
+                    $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
+                }
+                
                 $this->enviarMensajeDesdeTelegram($chatId, "Archivo guardado correctamente.\n\n Titulo: $fileName\n Link al visor: $urlVisor");
             } else {
-                $this->enviarMensajeDesdeTelegram($chatId, "Ocurrio un error al guardar la presentacion.");
+                $this->enviarMensajeDesdeTelegram($chatId, "Ocurrió un error al guardar la presentación.");
             }
-            
-
         } else if (isset($message['text'])) {
             $texto = strtolower(trim($message['text']));
-
+    
             if ($texto === '/start' || $texto === '/menu') {
                 $this->enviarComandosDisponibles($chatId);
             } else if ($texto === '/desplegar') {
@@ -421,14 +418,10 @@ class ControladorTelegram extends ResourceController
                 $this->enviarComandosDisponibles($chatId);
             }
         }
-
-        // Se Actualiza el ultimo update_id procesado obviamente despues de procesar el mensaje
-        file_put_contents($rutaUpdate, $updateId);
+    
+        return $this->respond(['mensaje' => 'Mensaje procesado']);
     }
-
-    return $this->respond(['mensaje' => 'Mensajes procesados']);
-}
-
+    
 
 
 

@@ -36,7 +36,7 @@ class Cors extends BaseConfig
          */
         
          
-         'allowedOrigins' => ['http://localhost:3000'],
+         'allowedOrigins' => ['http://localhost:3000','https://weekends-thou-seeds-fo.trycloudflare.com'],
 
 
         /**
@@ -72,7 +72,7 @@ class Cors extends BaseConfig
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
          */
         
-        'allowedHeaders' => ['Content-Type', 'Authorization', 'X-Requested-With'],
+        'allowedHeaders' => ['Content-Type', 'Authorization', 'X-Requested-With','ngrok-skip-browser-warning'],
 
         /**
          * Set headers to expose.

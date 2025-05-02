@@ -1,0 +1,90 @@
+.visor-container {
+  position: relative;
+  padding: 1rem;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  min-height: 100vh;
+}
+
+/* Estilo cuando está en fullscreen */
+.visor-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+/* Spinner centrado para carga */
+.loading-spinner {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Botones de navegación izquierda/derecha */
+.navegar {
+  position: absolute;
+  top: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10;
+  transform: translateY(-50%);
+}
+
+.navegar.izquierda {
+  left: 10px;
+}
+
+.navegar.derecha {
+  right: 10px;
+}
+
+/* Botón de fullscreen */
+.fullscreen-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+/* Contador de página */
+.contador-pagina {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* Ocultar cursor en modo inactivo */
+.hide-cursor {
+  cursor: none;
+}
+
+/* Contenedor de página PDF centrado */
+.pdf-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  margin: 0 auto;
+}
