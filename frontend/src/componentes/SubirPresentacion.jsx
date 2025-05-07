@@ -5,7 +5,7 @@ import { useUsuario } from '../contexto/UsuarioContexto';
 function SubirPresentacion() {
   const { usuario } = useUsuario();
   console.log(usuario)
-  const usuarioId = usuario?.id;  // Usamos el ID desde el contexto
+  const usuarioId = usuario?.usuario_id;  // Usamos el ID desde el contexto
   
   const [presentaciones, setPresentaciones] = useState([]);
   const [archivo, setArchivo] = useState(null);
@@ -88,7 +88,7 @@ function SubirPresentacion() {
       });
 
       if (response.ok) {
-        alert('Presentación eliminada.');
+        alert('Presentacion eliminada.');
         setPresentacionSeleccionada(null);
         obtenerPresentaciones();
       } else {
@@ -96,7 +96,7 @@ function SubirPresentacion() {
         alert(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error eliminando presentación:', error);
+      console.error('Error eliminando presentacion:', error);
     }
   }
 
@@ -124,7 +124,7 @@ function SubirPresentacion() {
             onChange={(e) => setDescripcion(e.target.value)}
           />
         </div>
-        <button type="submit" className="btn btn-success">Subir Presentación</button>
+        <button type="submit" className="btn btn-success">Subir Presentacion</button>
       </form>
 
       <hr />
@@ -163,8 +163,8 @@ function SubirPresentacion() {
       </button>
 
 
-      <p>ID del usuario: {usuario?.id}</p>
-      <p>Nombre: {usuario?.first_name}</p>
+      <p>ID del usuario: {usuario?.usuario_id}</p>
+      <p>Nombre: {usuario?.nombreDeUsuario}</p>
     </div>
   );
 }

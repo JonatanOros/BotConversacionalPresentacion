@@ -176,9 +176,12 @@ class ControladorTelegram extends ResourceController
 
         // Verificamos la extensión para elegir el visor adecuado
         if ('pptx' === strtolower($extension)) {
-            $urlVisor = "http://localhost:3000/visorpptx/" . $presentacionId;
+
+            //http://localhost:3000/visorpptx/
+            $urlVisor = "https://cedar-prescribed-meetings-strange.trycloudflare.com/visorpptx/" . $presentacionId;
         } else {
-            $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
+            //http://localhost:3000/visor/
+            $urlVisor = "https://cedar-prescribed-meetings-strange.trycloudflare.com/visor/" . $presentacionId;
         }
 
         $this->enviarMensajeDesdeTelegram($chatId, "Puedes ver tu presentación en: $urlVisor");
@@ -191,154 +194,12 @@ class ControladorTelegram extends ResourceController
 
     
     
-    
 
-
-    //Aqui son las antiguas funciones para el frontend
-    public function enviarComandoAlBot()
-    {
-        $mensaje = $this->request->getPost('mensaje');
-        $chatId = $this->request->getPost('chat_id');
-
-        if (!$mensaje || !$chatId) {
-            return $this->fail('Faltan parámetros: mensaje o chat_id');
-        }
-
-        $respuestaBot = $this->enviarMensaje($chatId, $mensaje);
-
-        return $this->respond([
-            'mensaje_enviado' => $mensaje,
-            'respuesta_bot' => $respuestaBot
-        ]);
-    }
-      
-
-    public function enviarArchivoAlBot()
-    {
-        $archivo = $this->request->getFile('archivo');
-        $chatId = $this->request->getPost('chat_id');
-        $presentacionId = $this->request->getPost('presentacion_id'); 
-    
-        if (!$archivo || !$chatId || !$archivo->isValid()) {
-            return $this->fail('Faltan parámetros o archivo inválido');
-        }
-    
-        $rutaTemporal = $archivo->getTempName();
-        $nombre = $archivo->getName();
-    
-        $respuesta = $this->enviarDocumento($chatId, $rutaTemporal, $nombre);
-    
-        // Aquí se forma el URL del visor para mandárselo por mensaje al bot
-        $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
-    
-        // Enviar ese enlace como mensaje al usuario por el bot
-        $this->enviarMensajeDesdeTelegram($chatId, "{Respuesta desde la WebApp}: Puedes ver tu presentación en: $urlVisor");
-    
-        return $this->respond([
-            'mensaje' => 'Archivo enviado al bot y URL generada',
-            'respuesta_bot' => $respuesta,
-            'url_visor' => $urlVisor
-        ]);
-    }
-    
-
-    
-
-    private function enviarMensaje($chatId, $texto)
-    {
-        $url = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-
-        $params = [
-            'chat_id' => $chatId,
-            'text' => $texto
-        ];
-
-        return $this->realizarPeticionCurl($url, $params);
-    }
-
-
-    public function enviarPresentacionPorID()
-    {
-    
-        $chatId = $this->request->getPost('chat_id');
-    
-        $presentacionId = $this->request->getPost('presentacion_id');
-
-    
-        if (!$chatId || !$presentacionId) {
-        return $this->fail('Faltan parámetros');
-        }
-
-    
-        $modelo = new PresentacionModel();
-    
-        $presentacion = $modelo->obtenerPresentacionPorID($presentacionId);
-
-    
-        if (!$presentacion) {
-        return $this->failNotFound('Presentación no encontrada');
-        }
 
    
-        $ruta = WRITEPATH . '../public/archivosPresentaciones/' . $presentacion['nombre_archivo']; // asegúrate del nombre correcto
-   
-        if (!file_exists($ruta)) {
-        return $this->failNotFound('Archivo no encontrado en el servidor');
-        }
+    
 
-   
-        $this->enviarDocumento($chatId, $ruta, $presentacion['nombre_archivo']);
-
-   
-        $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
-   
-        $this->enviarMensaje($chatId, "Aquí está tu presentación: $urlVisor");
-
-   
-        return $this->respond([
-        'status' => 'ok',
-        'url_visor' => $urlVisor
-   
-         ]);
-     }
-  
-
-
-
-
-
-    private function enviarDocumento($chatId, $rutaArchivo, $nombreArchivo)
-    {
-        $url = "https://api.telegram.org/bot{$this->botToken}/sendDocument";
-
-        $documento = new \CURLFile($rutaArchivo, mime_content_type($rutaArchivo), $nombreArchivo);
-
-        $params = [
-            'chat_id' => $chatId,
-            'document' => $documento
-        ];
-
-        return $this->realizarPeticionCurl($url, $params);
-    }
-
-
-
-
-
-
-    private function realizarPeticionCurl($url, $params)
-    {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-
-        $respuesta = curl_exec($ch);
-        $error = curl_error($ch);
-
-        curl_close($ch);
-
-        return $error ?: json_decode($respuesta, true);
-    }
+    
 
 
 
@@ -397,22 +258,55 @@ class ControladorTelegram extends ResourceController
             if ($presentacionId) {
 
                 if('pptx'===$resultadoSubida['extension']){
-                    $urlVisor = "http://localhost:3000/visorpptx/" . $presentacionId;
+                    //
+                    //http://localhost:3000
+                    $urlVisor = "https://cedar-prescribed-meetings-strange.trycloudflare.com/visorpptxTelegram/" . $presentacionId;
                 }else{
-                    $urlVisor = "http://localhost:3000/visor/" . $presentacionId;
+                    //http://localhost:3000
+                    $urlVisor = "https://cedar-prescribed-meetings-strange.trycloudflare.com/visorTelegram/" . $presentacionId;
                 }
                 
                 $this->enviarMensajeDesdeTelegram($chatId, "Archivo guardado correctamente.\n\n Titulo: $fileName\n Link al visor: $urlVisor");
             } else {
-                $this->enviarMensajeDesdeTelegram($chatId, "Ocurrió un error al guardar la presentación.");
+                $this->enviarMensajeDesdeTelegram($chatId, "Ocurrio un error al guardar la presentacion");
             }
         } else if (isset($message['text'])) {
             $texto = strtolower(trim($message['text']));
-    
+            $textoOriginal = trim($message['text']); // Para conservar mayúsculas en contraseña real
+            $patronContraseña = '/^contraseña:\s*(.+)$/i';
+
+
+
             if ($texto === '/start' || $texto === '/menu') {
                 $this->enviarComandosDisponibles($chatId);
             } else if ($texto === '/desplegar') {
-                $this->enviarMensajeDesdeTelegram($chatId, "Por favor, envía el archivo PDF o PowerPoint que deseas desplegar.");
+                $this->enviarMensajeDesdeTelegram($chatId, "Por favor, envia el archivo PDF o PowerPoint que deseas desplegar.");
+            } else if ($texto === '/registrarme') {
+
+                // Muestra instrucciones para enviar contraseña
+                $this->enviarMensajeDesdeTelegram(
+                    $chatId,
+                    "Tu usuario para entrar a la Web APP será: $chatId\n\n" .
+                    "Para completar tu registro, escribe el siguiente mensaje:\n\n" .
+                    "`contraseña:TuContraseñaAqui`\n\n" .
+                    "Por ejemplo:\n`contraseña:JuanLol2025`\n\n" .
+                    "Después de eso, se guardarán tus credenciales.",
+                    "Markdown"
+                );
+
+            } else if (preg_match($patronContraseña, $textoOriginal, $coincidencias)) {
+                $contrasena = trim($coincidencias[1]);
+        
+                if (empty($contrasena)) {
+                    $this->enviarMensajeDesdeTelegram($chatId, "No detecté una contraseña válida. Intenta de nuevo usando el formato: contraseña:TuContraseña");
+                    return $this->respond(['mensaje' => 'Contraseña vacía']);
+                }
+        
+                // Verifica si el usuario ya fue creado antes de registrar contraseña
+                $this->crearUsuarioDesdeTelegram($usuarioId, $nombreUsuario, $nombre, $apellido);
+                $this->crearCredencialesDesdeTelegram($usuarioId, $nombre, $chatId, $contrasena);
+        
+                
             } else {
                 $this->enviarMensajeDesdeTelegram($chatId, "No entiendo ese comando.");
                 $this->enviarComandosDisponibles($chatId);
@@ -435,26 +329,12 @@ private function enviarMensajeDesdeTelegram($chatId, $mensaje)
 
 private function enviarComandosDisponibles($chatId)
 {
-    $comandos = "Comandos disponibles:\n/menu - Volver al inicio\n/desplegar - Enviar presentación";
+    $comandos = "Comandos disponibles:\n/menu - Volver al inicio\n/desplegar - Enviar presentación\n
+    /registrarme - Crear Contraseña para acceder a la Web App";
     $this->enviarMensajeDesdeTelegram($chatId, $comandos);
 }
 
-private function guardarArchivoDesdeTelegram($fileId, $nombre)
-{
-    
 
-    // Obtener ruta del archivo en Telegram
-    $fileInfo = json_decode(file_get_contents("https://api.telegram.org/bot{$this->botToken}/getFile?file_id=$fileId"), true);
-    $filePath = $fileInfo['result']['file_path'];
-
-    $contenido = file_get_contents("https://api.telegram.org/file/bot{$this->botToken}/$filePath");
-
-    $ruta = WRITEPATH . '../public/archivosPresentaciones/';
-    $nombreUnico = uniqid() . '_' . $nombre;
-    file_put_contents($ruta . $nombreUnico, $contenido);
-
-    return $nombreUnico;
-}
 
 private function crearUsuarioDesdeTelegram($id, $username, $nombre, $apellido)
 {
@@ -468,25 +348,38 @@ private function crearUsuarioDesdeTelegram($id, $username, $nombre, $apellido)
             'nombre' => $nombre,
             'apellido' => $apellido,
             'rol' => 'invitado',
+            'usuarioWeb' => '',
+            'contrasena' => '',
             'creado_en' => date('Y-m-d H:i:s')
         ]);
     }
 }
 
-private function crearPresentacionDesdeTelegram($data)
-{
-    $presentacionModel = new \App\Models\PresentacionModel();
+   
 
-    $presentacionModel->crearPresentacion([
-        'usuario_id' => $data['usuario_id'],
-        'nombre' => $data['nombre'],
-        'file_url' => base_url('archivosPresentaciones/' . $data['archivo']),
-        'archivo' => $data['archivo'],
-        'creado_en' => date('Y-m-d H:i:s')
-    ]);
+
+    private function crearCredencialesDesdeTelegram($usuarioId, $nombre, $chatId, $contrasena)
+{
+    $usuarioModel = new \App\Models\UsuarioModel();
+
+    if ($usuarioModel->camposCredencialesLlenos($chatId)) {
+        $this->enviarMensajeDesdeTelegram($chatId, "Tu ya haz pasado por este proceso por lo que ya has completado el proceso de registro.\n Usa tu usuario y contraseña que ya habias creado para iniciar sesion en la Web App.");
+        return;
+    }
+
+    $usuarioWeb = $nombre . $chatId;
+    // Actualiza Firebase
+    $usuarioModel->actualizarCredenciales($usuarioId, $usuarioWeb, $contrasena);
+
+    $this->enviarMensajeDesdeTelegram($chatId, "Registro completado.\n\nUsuario Web: $chatId\nContraseña: $contrasena\n\nGuarda esta información para ingresar a la Web App.");
 }
 
-private function obtenerArchivoDesdeTelegram($fileId)
+
+
+
+
+
+    private function obtenerArchivoDesdeTelegram($fileId)
 {
     $token = 'TU_TOKEN_DEL_BOT';
 
@@ -507,9 +400,6 @@ private function obtenerArchivoDesdeTelegram($fileId)
     $fileUrl = "https://api.telegram.org/file/bot{$this->botToken}/$filePath";
     return file_get_contents($fileUrl); // Devuelve binario
 }
-
-
-
 
 
 

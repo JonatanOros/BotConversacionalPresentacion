@@ -133,7 +133,7 @@ class ControladorUsuario extends ResourceController
         // Reemplaza con el dominio real de tu frontend (usando ngrok por ejemplo)
         $frontendPermitido = 'https://tu-front.ngrok.app';
 
-        header("Access-Control-Allow-Origin: $frontendPermitido");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Headers: Content-Type");
         header("Access-Control-Allow-Methods: GET");
@@ -146,9 +146,8 @@ class ControladorUsuario extends ResourceController
                 'logueado' => true,
                 'usuario' => [
                     'usuario_id' => $session->get('usuario_id'),
-                    'nombre' => $session->get('nombre'),
-                    'apellido' => $session->get('apellido'),
-                    'nombreDeUsuario' => $session->get('nombreDeUsuario')
+                    'nombreDeUsuario' => $session->get('nombreDeUsuario'),
+                    
                 ]
             ]);
         } else {
@@ -168,7 +167,7 @@ class ControladorUsuario extends ResourceController
         // Reemplaza con el dominio real de tu frontend (usando ngrok por ejemplo)
         $frontendPermitido = 'https://tu-front.ngrok.app';
 
-        header("Access-Control-Allow-Origin: $frontendPermitido");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Headers: Content-Type");
         header("Access-Control-Allow-Methods: POST");
@@ -191,6 +190,7 @@ class ControladorUsuario extends ResourceController
         // CORS local
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Content-Type");
+        header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Methods: GET");
 
         
@@ -204,7 +204,58 @@ class ControladorUsuario extends ResourceController
             ]);
         }
     }
+
+
+
+    public function loginWeb()
+    {
+
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Headers: Content-Type");
+        header('Access-Control-Allow-Methods: POST, OPTIONS');
+
+        // Manejo de preflight OPTIONS
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            return $this->response->setStatusCode(200); // Responde sin hacer nada más
+        }
+
+        $datos = $this->request->getJSON(true); // el true convierte a array asociativo
+        $usuario = $datos['usuario'] ?? '';
+        $clave = $datos['clave'] ?? '';
+
+
+        $usuarioModel = new UsuarioModel();
+        $resultado = $usuarioModel->verificarCredenciales($usuario, $clave);
     
+        if ($resultado['valido']) {
+            $session = session();
+            $session->set([
+                'usuario_id' => $resultado['usuario_id'],
+                'nombreDeUsuario' => $usuario,
+                'logueado' => true,
+            ]);
+
+            $sessionName = session_name();
+            $sessionId = session_id();
+            $expire = gmdate('D, d-M-Y H:i:s T', time() + 7200);
+
+            header("Set-Cookie: $sessionName=$sessionId; Expires=$expire; Path=/; Secure; HttpOnly; SameSite=None; Partitioned");
+
+
+            return $this->response->setJSON(['status' => 'ok', 'logueado' => true]);
+
+        }
     
+        return $this->response->setJSON([
+            'status' => 'error',
+            'logueado' => false,
+            'mensaje' => $resultado['mensaje'] ?? 'Error desconocido'
+        ]);
+        
+    }
+    
+
+
     
 }

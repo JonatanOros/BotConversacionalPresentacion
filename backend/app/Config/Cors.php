@@ -36,7 +36,7 @@ class Cors extends BaseConfig
          */
         
          
-         'allowedOrigins' => ['http://localhost:3000','https://weekends-thou-seeds-fo.trycloudflare.com'],
+         'allowedOrigins' => ['http://localhost:3000','https://cedar-prescribed-meetings-strange.trycloudflare.com'],
 
 
         /**

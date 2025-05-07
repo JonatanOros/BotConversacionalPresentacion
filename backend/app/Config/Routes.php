@@ -16,6 +16,7 @@ $routes->post('/verificarOCrearUsuario','ControladorUsuario::verificarOCrearUsua
 
 // Ruta para crear Presentacion
 $routes->post('/crearPresentacion', 'ControladorPresentaciones::crearPresentacion');
+$routes->options('/crearPresentacion', 'ControladorPresentaciones::crearPresentacion');
 
 // Mensajes
 $routes->post('/crearMensaje', 'ControladorMensaje::crearMensaje');
@@ -83,5 +84,11 @@ $routes->options('/eliminarPresentacion/(:segment)', 'ControladorPresentaciones:
 //Cierra sesion
 $routes->post('/cerrarSesion', 'ControladorUsuario::cerrarSesion');
 $routes->options('/cerrarSesion', 'ControladorUsuario::cerrarSesion');
+
+
+//Verifica el login desde Web
+$routes->post('loginWeb', 'ControladorUsuario::loginWeb');
+$routes->options('loginWeb', 'ControladorUsuario::loginWeb');
+
 
 

@@ -10,8 +10,8 @@ function DesplegarPresentacion() {
   const [comando, setComando] = useState('');
 
   useEffect(() => {
-    if (usuario?.id_telegram) {
-      obtenerPresentaciones(usuario.id_telegram);
+    if (usuario?.usuario_id) {
+      obtenerPresentaciones(usuario.usuario_id);
     }
   }, [usuario]);
 
@@ -35,7 +35,9 @@ function DesplegarPresentacion() {
   }
 
   async function enviarComando() {
-    if (!comando.trim() || !usuario?.id_telegram) return;
+    
+    if (!comando.trim() || !usuario?.usuario_id) return;
+
 
     agregarMensaje(comando, 'usuario');
     setComando('');
@@ -49,7 +51,7 @@ function DesplegarPresentacion() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          chatId: usuario.id_telegram,
+          chatId: usuario.usuario_id,
           comando: comando,
         }),
       });
@@ -63,7 +65,7 @@ function DesplegarPresentacion() {
   }
 
   async function seleccionarPresentacion(presentacion) {
-    if (!usuario?.id_telegram) return;
+    if (!usuario?.usuario_id) return;
 
     agregarMensaje(`Seleccionó: ${presentacion.titulo}`, 'usuario');
 
@@ -76,7 +78,7 @@ function DesplegarPresentacion() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          chatId: usuario.id_telegram,
+          chatId: usuario.usuario_id,
           presentacionId: presentacion.id,
           nombreArchivo: presentacion.titulo,
         }),
@@ -86,7 +88,7 @@ function DesplegarPresentacion() {
       agregarMensaje(
         <>
           <strong>{data.mensaje}</strong><br />
-          <a href={data.url_visor} className="btn btn-sm btn-outline-primary mt-2" target="_blank" rel="noopener noreferrer">
+          <a href={data.url_visor} className="btn btn-sm btn-outline-primary mt-2"  rel="noopener noreferrer">
             Abrir en visor
           </a>
         </>,

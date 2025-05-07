@@ -16,7 +16,7 @@ function Visor() {
   const [fullscreen, setFullscreen] = useState(false);
   const [mostrarControles, setMostrarControles] = useState(false);
   const [mostrarCursor, setMostrarCursor] = useState(true);
-  const [pageWidth, setPageWidth] = useState(800);
+  const [pageDimensions, setPageDimensions] = useState({ width: 800 });
   const visorRef = useRef(null);
   const mouseTimer = useRef(null);
 
@@ -66,25 +66,27 @@ function Visor() {
   }, [id, numPages]);
 
   useEffect(() => {
-    const updateWidth = () => {
+    const updateDimensions = () => {
       if (fullscreen) {
-        setPageWidth(window.innerWidth * 0.95);
+        const width = window.innerWidth * 0.95;
+        const height = window.innerHeight * 0.95;
+        setPageDimensions({ width, height });
       } else {
         const contenedor = visorRef.current;
         if (contenedor) {
-          const maxWidth = Math.min(contenedor.offsetWidth, 800);
-          setPageWidth(maxWidth);
+          const width = Math.min(contenedor.offsetWidth, 800);
+          setPageDimensions({ width });
         }
       }
     };
 
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    document.addEventListener('fullscreenchange', updateWidth);
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    document.addEventListener('fullscreenchange', updateDimensions);
 
     return () => {
-      window.removeEventListener('resize', updateWidth);
-      document.removeEventListener('fullscreenchange', updateWidth);
+      window.removeEventListener('resize', updateDimensions);
+      document.removeEventListener('fullscreenchange', updateDimensions);
     };
   }, [fullscreen]);
 
@@ -133,7 +135,8 @@ function Visor() {
               pageNumber={paginaActual}
               renderTextLayer={false}
               renderAnnotationLayer={false}
-              width={pageWidth}
+              width={pageDimensions.width}
+              height={fullscreen ? pageDimensions.height : undefined}
             />
           </div>
         </Document>

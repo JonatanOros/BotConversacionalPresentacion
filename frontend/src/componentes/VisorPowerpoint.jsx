@@ -24,8 +24,9 @@ function VisorPowerpoint() {
         });
         const data = await response.json();
         if (data.titulo) {
-          const fileUrl = `${servidor}/archivosPresentaciones/${encodeURIComponent(data.titulo)}`;
-          const urlMicrosoftViewer = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`;
+          //const fileUrl = `${servidor}/archivosPresentaciones/${encodeURIComponent(data.titulo)}`;
+          const localFileUrl=`https://cedar-prescribed-meetings-strange.trycloudflare.com/presentacionPruebaFija/Conceptos%20de%20cultura%2C%20arte%20y%20sociedad.pptx`;
+          const urlMicrosoftViewer = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(localFileUrl)}`;
           setUrlPowerPoint(urlMicrosoftViewer);
         }
       } catch (error) {

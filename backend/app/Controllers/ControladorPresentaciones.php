@@ -15,6 +15,7 @@ class ControladorPresentaciones extends ResourceController
 {
 
     protected $presentacionModel;
+    public $dominio="jjk";
 
     public function __construct()
     {
@@ -23,7 +24,7 @@ class ControladorPresentaciones extends ResourceController
 
     public function subirArchivo()
     {
-        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $this->response->setHeader('Access-Control-Allow-Origin', 'https://cedar-prescribed-meetings-strange.trycloudflare.com');
         $this->response->setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
@@ -77,7 +78,7 @@ class ControladorPresentaciones extends ResourceController
     {
 
 
-        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $this->response->setHeader('Access-Control-Allow-Origin', 'https://cedar-prescribed-meetings-strange.trycloudflare.com');
         $this->response->setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -187,7 +188,7 @@ class ControladorPresentaciones extends ResourceController
 
     public function obtenerPresentacion($id)
     {
-        header("Access-Control-Allow-Origin: https://frontend.ngrok.app");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 
@@ -201,7 +202,7 @@ class ControladorPresentaciones extends ResourceController
     {
         // Agregar CORS headers manuales
         
-        header("Access-Control-Allow-Origin: https://frontend.ngrok.app");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
 
 
@@ -289,7 +290,7 @@ class ControladorPresentaciones extends ResourceController
     public function eliminarPresentacion($id)
     {
         // Encabezados CORS
-        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $this->response->setHeader('Access-Control-Allow-Origin', 'https://cedar-prescribed-meetings-strange.trycloudflare.com');
         $this->response->setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
         $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
